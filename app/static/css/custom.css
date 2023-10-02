@@ -8,3 +8,7 @@
 .no-gutters img{
     margin-left: 22%;
 }
+
+.hideit{
+    display: none !important;
+}

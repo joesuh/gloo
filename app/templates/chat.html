@@ -162,7 +162,10 @@
             var questionTagId = 'question_'+questionId;
             if(audio != undefined && audio != ''){
                 var audioFilePath = '{{ liveURL }}/static/transcripts/answers/'+audio
-                var playAudio = '<audio id="'+newID+'"><source src="'+audioFilePath+'" type="audio/mpeg"></audio><p class="label label-info" onclick="playAudio('+questionId+');" id="play_'+newID+'">PLAY</p>';
+                var playAudio = '<audio id="'+newID+'"><source src="'+audioFilePath+'" type="audio/mpeg"></audio> \
+                <p class="label label-info" onclick="playAudio('+questionId+');" id="play_'+newID+'">Play</p> \
+                <p class="label label-info hideit" onclick="pauseAudio('+questionId+');" id="pause_'+newID+'">Pause</p> \
+                ';
                 $('#'+questionTagId).append(playAudio);
                 // $('audio#'+newID)[0].play();
 
@@ -174,6 +177,13 @@
 
         function playAudio(aId){
             $('audio#audio_'+aId)[0].play();
+            $('#play_audio_'+aId).addClass('hideit');
+            $('#pause_audio_'+aId).removeClass('hideit');
+        }
+        function pauseAudio(aId){
+            $('audio#audio_'+aId)[0].pause();
+            $('#pause_audio_'+aId).addClass('hideit');
+            $('#play_audio_'+aId).removeClass('hideit');
         }
 
         function addQuestionAnswer(text, type,qId, audioID = ''){
