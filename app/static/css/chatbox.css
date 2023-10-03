@@ -584,7 +584,7 @@ li.repaly .time {
     transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
-.send-box button {
+.send-box button.btn {
     border: none;
     background: #3867d6;
     padding: 0.375rem 5px;
@@ -596,7 +596,7 @@ li.repaly .time {
     margin-left: 1%;
 }
 
-.send-box button i {
+.send-box button.btn i {
     margin-right: 5px;
 }
 

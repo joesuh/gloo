@@ -1,7 +1,12 @@
-from flask import Flask,render_template, redirect
+import os
+from flask import logging, Flask, render_template, request, flash, redirect, jsonify
 import urllib.request, json
 from app.main import bp
 from config import Config
+import time
+import speech_recognition as sr
+from random import randint
+from elevenlabs import generate, play, save, set_api_key
 
 becomeNew ={
     'id': 19,
@@ -60,3 +65,90 @@ def chat(name):
         return render_template('chat.html', channel = channelDetail, preQuestions = preQuestions, liveURL = liveURL)
     else:
         return redirect('/')
+
+def random_with_N_digits(n):
+    range_start = 10**(n-1)
+    range_end = (10**n)-1
+    return randint(range_start, range_end)
+
+@bp.route('/record/<name>')
+def record(name):
+    liveURL = Config.LIVE_DOMAIN
+    # return render_template('audio_to_text.html', liveURL = liveURL)
+    return render_template('record.html', liveURL = liveURL)
+    # data = getChannelDetails(name)
+    # if data['status']:
+    #     channelDetail = json.loads(data["result"])
+    #     preQuestions = json.loads(data['preQuestions'])
+    #     return render_template('record.html', channel = channelDetail, preQuestions = preQuestions, liveURL = liveURL)
+    #     return render_template('record.html', channel = channelDetail, preQuestions = preQuestions, liveURL = liveURL)
+    # else:
+    #     return redirect('/')
+
+@bp.route('/audio', methods=['POST'])
+def audio():
+    # print('*****************************************')
+    # print(request.data)
+    # print('*****************************************')
+    audioFileName = str(random_with_N_digits(10)) + '.wav'
+    audioFileFolderPath = os.path.join(Config.ANSWER_AUDIO_FOLDER, audioFileName)
+    r = sr.Recognizer()
+    with open(audioFileFolderPath, 'wb') as f:
+        f.write(request.data)
+    with sr.AudioFile(audioFileFolderPath) as source:
+        audio_data = r.record(source)
+        # text = r.recognize_google(audio_data, language='en-IN', show_all=True)
+        text = r.recognize_google(audio_data, language='en-IN', show_all=False)
+        print(text)
+        return_text = text
+        fileName = textToAudio(text, audioFileName)
+        # try:
+        #     for num, texts in enumerate(text['alternative']):
+        #         return_text += str(num+1) +") " + texts['transcript']  + " <br> "
+        # except:
+        #     return_text = " Sorry!!!! Voice not Detected "
+    # return str(return_text)
+    return {"audio": fileName, "text": str(text), 'status': True}
+
+def textToAudio(text, audioFileName):
+    try:
+        set_api_key(Config.ELEVENLABS_API_KEY)
+        audioFileFolderPath = os.path.join(Config.QUESTION_AUDIO_FOLDER, audioFileName)
+        audio = generate(
+            text=text,
+            voice="29cwSzDzWESPbIisY3Bi",
+            model="eleven_monolingual_v1"
+        )
+        save(audio, audioFileFolderPath)
+        return audioFileName
+    except Exception as e:
+        print('textToAudio Exception = ', e)
+        return ''
+
+# @bp.route("/answer_voice", methods=["POST"])
+# def get_video_answer_voice():
+#     try:
+#         set_api_key(Config.ELEVENLABS_API_KEY)
+#         answer = request.json['answer']
+#         questionId = request.json['questionId']
+#         channelId = request.json['channelId']
+#         fAnswer = cleanhtml(answer)
+#         # fAnswer = (answer[:300]) if len(answer) > 300 else answer
+#         print('fAnswer = ', fAnswer)
+#         audioFileName = str(channelId) + '_' + str(questionId) + '_answer.wav'
+#         answerAudioPath = current_app.config['ANSWER_AUDIO_FOLDER'] + '/' + audioFileName
+#         question = Question.query.filter(Question.id == questionId).first()
+#         if not os.path.exists(answerAudioPath):
+#             audio = generate(
+#                 text=fAnswer,
+#                 voice="29cwSzDzWESPbIisY3Bi",
+#                 model="eleven_monolingual_v1"
+#             )
+#             save(audio, answerAudioPath)
+#             question.audio = audioFileName
+#             db.session.commit()
+#         print('audioFileName = ', audioFileName)    
+#         return jsonify({"audio": audioFileName, 'status': True})
+#     except Exception as e:
+#         print('get_video_answer_voice Exception = ', e)
+#         return jsonify({"audio": '', 'status': False})
