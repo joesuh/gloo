@@ -100,8 +100,8 @@ function createDownloadLink(blob) {
             // baseURL = "http://127.0.0.1:5555/static/audio/questions/"+result.audio
             baseURL = "https://gloo.pastors.ai/static/audio/questions/"+result.audio
             au.src = baseURL;
-            $('#replyAudio').append(au);
-
+            // $('#replyAudio').append(au);
+            // $('#replyAudio audio')[0].play()
             const audio = new Audio(baseURL);
             audio.play();
 
