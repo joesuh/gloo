@@ -9,7 +9,9 @@
                     <div class="row no-gutters">
                         <!-- <div class="col-xl-5 d-flex align-items-stretch justify-content-center justify-content-lg-start"> -->
                         <div class="col-xl-4 d-flex align-items-stretch">
-                            <img src="{{ channel.channel_logo }}" alt="">
+                            <a href="{{ url_for('main.record', name=channel.channel_name) }}">
+                                <img style="width: 140px;margin-left: 60%;" src="{{ channel.channel_logo }}" alt="Cgannel logo">
+                            </a>
                         </div>
                         <div class="col-xl-8 ps-0 ps-lg-5 pe-lg-1 d-flex align-items-stretch">
                         <div class="content d-flex flex-column justify-content-center">
