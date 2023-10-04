@@ -9,14 +9,19 @@ var recordButton = document.getElementById("recordButton");
 var stopButton = document.getElementById("stopButton");
 var pauseButton = document.getElementById("pauseButton");
 
+if (!LiveURL || LiveURL == ''){
+    LiveURL = 'https://gloo.pastors.ai/'
+}
 function startRecording() {
-	console.log("recordButton clicked");
+	// console.log("recordButton clicked");
     var constraints = { audio: true, video:false }
 	document.getElementById("recordButton").disabled = true;
+    document.getElementById("recordButton").classList.add('d-none');
 	document.getElementById("stopButton").disabled = false;
+    document.getElementById("stopButton").classList.remove('d-none');
 	document.getElementById("pauseButton").disabled = false;
 	navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
-		console.log("getUserMedia() success, stream created, initializing Recorder.js ...");
+		// console.log("getUserMedia() success, stream created, initializing Recorder.js ...");
 		audioContext = new AudioContext();
 		gumStream = stream;
 		input = audioContext.createMediaStreamSource(stream);
@@ -26,13 +31,15 @@ function startRecording() {
         addActionClass('listening');
 	}).catch(function(err) {
         document.getElementById("recordButton").disabled = false;
+        document.getElementById("recordButton").classList.remove('d-none');
         document.getElementById("stopButton").disabled = true;
+        document.getElementById("stopButton").classList.add('d-none');
         document.getElementById("pauseButton").disabled = true;
 	});
 }
 
 function pauseRecording(){
-	console.log("pauseButton clicked rec.recording=",rec.recording );
+	// console.log("pauseButton clicked rec.recording=",rec.recording );
 	if (rec.recording){
 		rec.stop();
 		document.getElementById("pauseButton").innerHTML="Resume";
@@ -52,7 +59,9 @@ function addActionClass(addClass){
     if ($(".processing-icons").hasClass('thinking')) {
         $(".processing-icons").removeClass( 'thinking');
     }
-    $('.processing-icons').addClass(addClass);
+    if(addClass != 'idle'){
+        $('.processing-icons').addClass(addClass);
+    }
 }
 
 
@@ -61,6 +70,7 @@ function stopRecording() {
 	console.log("stopButton clicked");
 	document.getElementById("recordButton").disabled = false;
     document.getElementById("stopButton").disabled = true;
+    document.getElementById("stopButton").classList.add('d-none');
     document.getElementById("pauseButton").disabled = true;
 	document.getElementById("pauseButton").innerHTML="Pause";
 	rec.stop();
@@ -84,7 +94,19 @@ function createDownloadLink(blob) {
 	// //add the new audio element to li
 	// li.appendChild(au);	
     let csrf_token = "{{ csrf_token() }}";
-    fetch('/audio', {
+    var APIURL = LiveURL+'/video/recording';
+    // var APIURL = LiveURL+'/video/recordingtest';
+
+    // console.log('blob = ',blob)
+    // // var data = { audio: blob, name:'@BecomeNew' };
+
+    // var wavFile = new File([ blob ], "audio.wav");      
+    // console.log('blob 2 = ', wavFile)
+    // const formData = new FormData();
+    // formData.append("audio", blob);
+    // formData.append("name", '@BecomeNew');
+    // console.log('blob = ', wavFile.files[0])
+    fetch(APIURL, {
         method: "POST", 
         body: blob,
         headers: {
@@ -98,14 +120,32 @@ function createDownloadLink(blob) {
             // console.log('res4 = ', result.audio)
             // console.log('res5 = ', result["audio"])
             // baseURL = "http://127.0.0.1:5555/static/audio/questions/"+result.audio
-            baseURL = "https://gloo.pastors.ai/static/audio/questions/"+result.audio
+            baseURL = LiveURL+"/static/audios/answers/"+result.audio
             au.src = baseURL;
-            // $('#replyAudio').append(au);
-            // $('#replyAudio audio')[0].play()
-            const audio = new Audio(baseURL);
-            audio.play();
+            $('#replyAudio').append(au);
+            $('#replyAudio audio')[0].play()
 
-            addActionClass('speaking');
+            
+            // document.getElementById("recordButton").classList.remove('d-none');
             document.getElementById('output').innerHTML = result.text;
+
+            $('#replyAudio audio').on('playing', function() {
+                playing = true;
+                addActionClass('speaking');
+                console.log('PLAYING')
+                // disable button/link
+             });
+
+             $('#replyAudio audio').on('ended', function() {
+                playing = false;
+                console.log('**************************END')
+                addActionClass('idle');
+                document.getElementById("recordButton").classList.remove('d-none');
+                document.getElementById('output').innerHTML = '';
+                $('#replyAudio').html('')
+                // enable button/link
+             });
+            // const audio = new Audio(baseURL);
+            // audio.play();
     }));
 }

@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    
+    <script>
+        let LiveURL = "{{ liveURL }}";
+    </script>
+    <script src="/static/js/app.js"></script>
     <style>
         body{
             background: #000;
@@ -90,7 +93,7 @@
 
                                         <button id="recordButton" onclick="startRecording()" ><img src="/static/img/record-icon.png"/></button>
                                         <button id="pauseButton" class="d-none" onclick="pauseRecording()" disabled>Pause</button>
-                                        <button id="stopButton" onclick="stopRecording()" disabled><img src="/static/img/video-pause-button.png"/></button>
+                                        <button id="stopButton" class="d-none" onclick="stopRecording()" disabled><img src="/static/img/video-pause-button.png"/></button>
 
                                         <!-- <a href="javascript:void(0);" id="recordButton" onclick="startRecording()"><img src="/static/img/record-icon.png"/></a>
                                         <a href="javascript:void(0);" id="stopButton" onclick="stopRecording()" disabled><img src="/static/img/video-pause-button.png"/></a> -->
