@@ -44,3 +44,4 @@ app/__pycache__/
 db/*.sqlite3
 log/*.log
 tmp/
+config.py

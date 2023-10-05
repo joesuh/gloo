@@ -27,7 +27,9 @@
         <div class="container d-flex align-items-center justify-content-between">
           <div class="logo">
             <p>
-                <a href="{{ url_for('main.index') }}">Pastors.AI</a>
+                {% if not newPage: %}
+                    <a href="{{ url_for('main.index') }}">Pastors.AI</a>
+                {% endif %}
             </p>
           </div>
         </div>
