@@ -45,3 +45,6 @@ db/*.sqlite3
 log/*.log
 tmp/
 config.py
+__pycache__/config.cpython-311.pyc
+app/main/__pycache__/routes.cpython-311.pyc
+app/__pycache__/__init__.cpython-311.pyc
