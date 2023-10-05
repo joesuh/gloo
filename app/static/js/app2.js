@@ -94,8 +94,8 @@ function createDownloadLink(blob) {
 	// //add the new audio element to li
 	// li.appendChild(au);	
     let csrf_token = "{{ csrf_token() }}";
-    // var APIURL = LiveURL+'/video/recording';
-    var APIURL = LiveURL+'/video/recordingtest';
+    var APIURL = LiveURL+'/video/recording';
+    // var APIURL = LiveURL+'/video/recordingtest';
 
     // console.log('blob = ',blob)
     // // var data = { audio: blob, name:'@BecomeNew' };
